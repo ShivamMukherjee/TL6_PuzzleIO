@@ -15,7 +15,7 @@ void AMovingPlatform::BeginPlay()
 	// The platform must move!
 	SetMobility(EComponentMobility::Movable);
 
-	// only set replication from server
+	// only set up replication if this device is the server
 	if (HasAuthority())
 	{
 		SetReplicates(true);
@@ -31,16 +31,16 @@ void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// only update location on the server, until the target location is reached
-	if (HasAuthority())
+	// Only update location on the server
+	if (HasAuthority() && ActiveTriggerCount > 0)
 	{
 		// Initialize the location of the object with its current location, then update its value
 		FVector LocationPerTick = GetActorLocation();
 
-		// find the direction and magnitude of the path to be followed
+		// Find the direction and magnitude of the path to be followed
 		FVector Path = GlobalTargetLocation - GlobalStartLocation;
-		PathDistance = Path.Size();
-		PathDirection = Path.GetSafeNormal();
+		float PathDistance = Path.Size();
+		FVector PathDirection = Path.GetSafeNormal();
 
 		// Swap direction if the target reaches its destination
 		{
@@ -53,6 +53,7 @@ void AMovingPlatform::Tick(float DeltaTime)
 			}
 		}
 		
+		// Update the position of the platform each frame
 		LocationPerTick += PathDirection * Speed * DeltaTime;
 		SetActorLocation(LocationPerTick);
 	}
