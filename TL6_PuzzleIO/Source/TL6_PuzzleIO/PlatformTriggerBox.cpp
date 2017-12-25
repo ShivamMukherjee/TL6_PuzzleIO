@@ -31,10 +31,9 @@ void APlatformTriggerBox::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Some platforms being triggered are also being inhibited! Rescinding control!"));
 
 		// each player fires a quit message and exits from the game
-		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		for (auto PlayerController = GetWorld()->GetPlayerControllerIterator(); PlayerController; ++PlayerController)
 		{
-			APlayerController* PlayerController = *Iterator;
-			PlayerController->ConsoleCommand("quit");
+			PlayerController->Get()->ConsoleCommand("quit");
 		}
 	}
 }
